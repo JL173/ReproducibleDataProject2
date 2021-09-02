@@ -1,0 +1,37 @@
+---
+title: 'Project 2'
+author: "JL"
+date: "02/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Synopsis
+
+Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
+
+## Summary of Findings
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+# Loading and Processing the Raw Data
+
+This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
+
+```{r}
+# Download data
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", "rawdata.csv.bz2")
+
+# Download documentation for data
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf", "rawdata_documentation.pdf", mode = "wb")
+
+# import data into dataframe
+raw <- read.csv("rawdata.csv.bz2")
+```
+

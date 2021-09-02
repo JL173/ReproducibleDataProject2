@@ -82,7 +82,10 @@ For this assignment you will need to publish your analysis on [RPubs.com](http:/
 Once your document is published to RPubs, you should get a unique URL to that document. Make a note of this URL as you will need it to submit your assignment.
 
 NOTE: If you are having trouble connecting with RPubs due to proxy-related or other issues, you can upload your final analysis document file as a PDF to Coursera instead.
-Submitting Your Assignment
+
+An example publication can be found [here](https://rpubs.com/rdpeng/13396).
+
+### Submitting Your Assignment
 
 In order to submit this assignment, you must copy the RPubs URL for your completed data analysis document in to the peer assessment question.
 

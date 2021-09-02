@@ -85,6 +85,12 @@ states <- select(raw, "STATE__", "STATE") %>%
 
 colnames(states) <- c("state_id", "state_name")
 
+# states contains duplicates, over separate IDs.
+# Manually remove against a list of abbreviations
+states <- states[-c(79, 59, 63, 57, 56, 55, 95, 94, 93, 65, 70,
+                    60, 68, 61,  66, 73, 71, 72, 76, 74, 62,
+                    67, 78, 77, 51, 69, 75, 53, 64, 58, 20, 8), ]
+
 
 # trim raw to chosen variables
 clean <- select(raw, c("STATE__", "COUNTY", "BGN_DATE", "BGN_TIME", "EVTYPE", "LENGTH", "WIDTH", "F", "REMARKS", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP"))
@@ -275,7 +281,82 @@ state_harm <- clean %>%
             fatalities = sum(fatalities),
             injuries = sum(injuries),
             total_sum = sum(fatalities) + sum(injuries)) %>%
-  arrange(desc(total_sum), desc(total_damage))
+  arrange(desc(number_of_events))
 
 state_harm <- merge(state_harm, states)
+
+
+# copies of dataframe to merge
+state_n <- state_harm
+state_p <- state_harm
+state_f <- state_harm
+state_i <- state_harm
+
+# rename two columns to merge on
+state_n$values <- state_n$number_of_events
+colnames(state_p)[3] <- "values"
+colnames(state_f)[6] <- "values"
+colnames(state_i)[7] <- "values"
+
+# create a label to split data on plotting
+state_n$label <- "Number of Events"
+state_p$label <- "Property Damage $"
+state_f$label <- "Fatalities"
+state_i$label <- "Injuries"
+
+# select only the columns we need for a merge
+state_n <- state_n %>% select(c("state_name", "values", "label", "number_of_events"))
+state_p <- state_p %>% select(c("state_name", "values", "label", "number_of_events"))
+state_f <- state_f %>% select(c("state_name", "values", "label", "number_of_events"))
+state_i <- state_i %>% select(c("state_name", "values", "label", "number_of_events"))
+
+
+# merge dataframes, remove the temprorary dataframes
+state_n <- rbind(state_n, state_p)
+state_n <- rbind(state_n, state_f)
+state_n <- rbind(state_n, state_i)
+
+state_harm <- state_n
+
+# remove temporary dataframes
+rm(state_n, state_p, state_f, state_i)
+```
+
+```{r}
+# sorting
+arrange(state_harm, desc(number_of_events))
+
+```
+
+```{r, fig.height=14, fig.width=7}
+# plot for the top 20 by total of fatalities and injuries
+ggplot(state_harm, aes(x = values,
+                 y = reorder(state_name, number_of_events),
+                 colour = label),
+                 size = 3, shape = 22) + 
+  
+  theme_economist() + 
+  
+  scale_colour_gdocs() +
+  
+  geom_point() +
+  
+  labs(x = NULL,
+       y = NULL,
+       colour = NULL) +
+  
+  guides(fill = guide_legend(title = NULL)) +
+  
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.x = element_line(colour = "white",
+                                      size = 1,
+                                      linetype = "dotted")) + 
+  
+  scale_x_log10(breaks = c(1e1, 1e3, 1e5),
+                labels = c("10", "1,000", "100,000")) +
+  
+  ggtitle("Destructive Weather Events in United States",
+          subtitle = "National Climatic Data Center 1950 - 2011")
+
 ```

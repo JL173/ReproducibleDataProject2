@@ -19,6 +19,7 @@ Storms and other severe weather events can cause both public health and economic
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
+library(ggthemes)
 ```
 
 # Loading and Processing the Raw Data
@@ -146,13 +147,16 @@ rm(direct_harm)
 
 Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.
 
-```{r}
-
+```{r fig.height=5, fig.width=7}
 # plot for the top 20 by total of fatalities and injuries
 ggplot(dh_short, aes(x = Incidents,
                  y = reorder(event, total_sum),
                  colour = label),
                  size = 3) + 
+  
+  theme_economist() + 
+  
+  scale_colour_stata() +
   
   geom_point() +
   
@@ -163,13 +167,7 @@ ggplot(dh_short, aes(x = Incidents,
   guides(fill = guide_legend(title = NULL)) +
   
   theme(
-    legend.position = "bottom",
-    plot.title = element_text(size = rel(1.2), lineheight = 0.9,
-                               face = "bold", color = "brown"),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.major.y = element_line(colour = "lightgrey", linetype = "dashed")
-  ) + 
+    legend.position = "bottom") + 
   
   scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5),
                 labels = c("10", "100", "1,000", "10,000", "100,000")) +
@@ -218,8 +216,48 @@ eco_short2$label <- "Crop Damage"
 eco_short <- rbind(eco_short, eco_short2)
 
 # rescale damage to thousands of dollars
-eco_short$total_damage <- eco_short$total_damage/1e3
+eco_short$total_damage <- eco_short$total_damage
 
 rm(eco_short2)
 rm(economic_harm)
+```
+
+### FILL information and summary
+
+```{r, fig.height=5, fig.width=7}
+# plot for the top 20 by total of fatalities and injuries
+ggplot(eco_short, aes(x = Incidents,
+                 y = reorder(event, total_damage),
+                 colour = label),
+                 size = 3) + 
+  
+  theme_economist() + 
+  
+  scale_colour_stata() +
+  
+  geom_point() +
+  
+  labs(x = "Damage in $",
+       y = NULL,
+       colour = NULL) +
+  
+  guides(fill = guide_legend(title = NULL)) +
+  
+  theme(
+    legend.position = "bottom") + 
+  
+  scale_x_log10(breaks = c(1e4, 1e5, 1e6),
+                labels = c("10,000", "100,000", "1,000,000")) +
+  
+  ggtitle("Total Damage caused by Weather Events",
+          subtitle = "United States 1950 - 2011")
+
+```
+
+ANALYSIS / SUMMARY OF VISUAL
+
+## State that suffers the most
+
+```{r}
+
 ```

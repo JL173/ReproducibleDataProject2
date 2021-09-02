@@ -1,8 +1,10 @@
 ---
-title: 'Exploration of National Climatic Data Center Storm Events Data'
+title: "Exploration of National Climatic Data Center Storm Events Data"
 author: "JL"
 date: "02/09/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}

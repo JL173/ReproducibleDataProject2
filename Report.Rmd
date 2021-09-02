@@ -212,7 +212,7 @@ ggplot(dh_short, aes(x = Incidents,
                 labels = c("10", "100", "1,000", "10,000", "100,000"))
 ```
 
-As you can see from the graph above, for every event, the number of injuries surpasses the number of fatalities. Which is to expected. The exception is Rip Current, which understandably is very dangerous once one has been dragged into one. The most destructive event by far in the U.S. is Tornado, with both regards to total fatalities and total injuries. The latter by a stunning degree. Tornadoes are highly destructive events and they frequent the country.
+As you can see from the graph above, for the top 20 events, the number of injuries surpasses the number of fatalities. Which is to expected. The exception is Rip Current, which understandably is very dangerous once one has been dragged into one. The most destructive event by far in the U.S. is Tornado, with both regards to total fatalities and total injuries. The latter by a stunning degree. Tornadoes are highly destructive events and they frequent the country. At the bottom of the top 20 events is Wild/Forest Fire, which, alike Hail, show that incidents are much less likely to be fatal, however could still be quite serious.
 
 ## Most harmful events with respect to the economy
 
@@ -296,12 +296,13 @@ ggplot(eco_short, aes(x = Incidents,
   
   scale_x_log10(breaks = c(1e5, 1e7, 1e9, 1e11),
                 labels = c("1", "100", "10,000", "1,000,000"))
-
 ```
 
-ANALYSIS / SUMMARY OF VISUAL
+As mentioned, Floods cause the most damage to property, but summed with River Flood, these together overtake Drought as most damaging for crops, and both are likely to occur in tandem. Storm Surge is another event to take note of. It is third in property damage yet causes relatively small crop damage. Understandably so as it would almost solely affects electronics. Events that cause more crop damage than property damage include Frost/Freeze, Extreme Cold, Heavy Rain, Ice Storm, and Drought. Concluding that temperature affects primarily crops over property, though still result in many damages. 
 
 ## State that suffers the most
+
+As we have the data that allows us to investigate down to the state level, we will. We will use the same steps as before, yet grouping by state and aggregating for each of what we have explored already. We'll sort by the number of events in this case.
 
 ```{r}
 state_harm <- clean %>%
@@ -314,7 +315,14 @@ state_harm <- clean %>%
 
 state_harm <- merge(state_harm, states)
 
+head(state_harm)
+```
 
+From the summary above we can see that there is a great range of values across the United States. Undoubtedly, size of state and population are strong factors in here, However, it is not unreasonable to assume that both location and government management of prevention and preparation play a significant role also.
+
+To build a visual, we will adjust the dataframe. Collapse number of events, damages, fatalities and injuries into one column, but associating a label with each, for ggplot to interpret.
+
+```{r}
 # copies of dataframe to merge
 state_n <- state_harm
 state_p <- state_harm
@@ -354,6 +362,8 @@ arrange(state_harm, desc(number_of_events))
 rm(state_n, state_p, state_f, state_i)
 ```
 
+Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.
+
 ```{r, fig.height=14, fig.width=7}
 # plot for the top 20 by total of fatalities and injuries
 ggplot(state_harm, aes(x = values,
@@ -389,5 +399,6 @@ ggplot(state_harm, aes(x = values,
   
   scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7),
                 labels = c("10", "100", "1,000","10,000", "100,000", "1,000,000", "10,000,000"))
-
 ```
+
+From this visual, we can see that a strong association between the number of events and all other variables. Which is completely expected. California has had the most damages overall, we know that several droughts have been very costly. However it is Illinois and Texas (in that order) where most fatalities have occurred due to weather. Illinois has a history of Tornados, notably the [Tri-State Torndao](https://en.wikipedia.org/wiki/Tri-State_Tornado). Texas has a very variable climate and also suffers Hurricanes and Tornados and other [storms](https://en.wikipedia.org/wiki/Texas#Storms). Naturally, this contributes to the high level of injuries in Texas. The "safest" states then are Rhode Island and Maryland. Interestingly, for Maryland, it suggests that with almost as many injuries as number of events, that makes it almost one person injured for each event. Though, there are fewer fatalities and injuries due to weather in Rhode Island, making it the "safest state for bad weather".

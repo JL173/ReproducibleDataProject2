@@ -114,35 +114,76 @@ We will group by event and summarise the data
   summarise(number_of_events = n(),
             total_fatalities = sum(fatalities),
             total_injuries = sum(injuries),
-            total_sum = sum(fatalities) + sum(injuries),
-            mean_fatalities = mean(fatalities),
-            mean_injuries = mean(injuries)) %>%
+            total_sum = sum(fatalities) + sum(injuries)) %>%
   arrange(desc(total_sum))
+```
 
-# plot for the top 15 by total of fatalities and injuries
+Now we have the summarised data.
+
+##### fill here
+
+```{r}
+# trim a copy of dataframe to top20, select key columns
+dh_short <- direct_harm[1:20, ] %>%
+  select(-c("mean_fatalities","mean_injuries"))
+dh_short2 <- dh_short
+
+# rename two columns to merge on
+colnames(dh_short)[3] <- "Incidents"
+colnames(dh_short2)[4] <- "Incidents"
+
+# select only the columns we need for a merge
+dh_short <- select(dh_short, c("event", "total_sum", "Incidents"))
+dh_short2 <- select(dh_short2, c("event", "total_sum", "Incidents"))
+
+# create a label to split data on plotting
+dh_short$label <- "total_fatalities"
+dh_short2$label <- "total_injuries"
+
+# merge dataframes, remove the temprorary second
+dh_short <- rbind(dh_short, dh_short2)
+rm(dh_short2)
+```
+
+Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.
+```{r}
+
+# plot for the top 20 by total of fatalities and injuries
 ggplot(direct_harm[1:20, ]) + 
   
   geom_point(aes(x = total_fatalities,
                  y = reorder(event, total_sum)),
-             size = 3, colour = "#B22222") +
-  
+             size = 3, color = "#de425b", fill = "#de425b") +
+ 
+   
   geom_point(aes(x = total_injuries,
                  y = reorder(event, total_sum)),
-             size = 3, colour = "#22B2B2") +
+             size = 3, color = "#488f31", fill = "488f31") +
+  
+  labs(x = "Sum of Incidents",
+       y = NULL,
+       color = "Legend") +
+  
+  scale_color_manual(values = c("Fatalities" = "#de425b",
+                                 "Injuries" = "#488f31")) +
   
   theme(
+    plot.title = element_text(size = rel(1.2), lineheight = 0.9,
+                               face = "bold", color = "brown"),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
-    panel.grid.major.y = element_line(colour = "grey60", linetype = "dashed")
+    panel.grid.major.y = element_line(colour = "lightgrey", linetype = "dashed")
   ) + 
-  scale_x_log10() +
-  scale_colour_manual(name = "",
-                      values = c("Fatalities" = "#B22222",
-                                 "Injuries" = "#22B2B2"))+
+  
+  scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5),
+                labels = c("10", "100", "1,000", "10,000", "100,000")) +
   
   ggtitle("Total Fatalities and Injuries by Weather Events",
-          subtitle = "United States 1950 - 2011") + 
-  xlab("Sum of Incidents") +
-  ylab(NULL)
-  
+          subtitle = "United States 1950 - 2011")
+
+```
+```{r}
+# another attempt at plotting to get a legend
+
+
 ```

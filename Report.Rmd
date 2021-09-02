@@ -105,11 +105,28 @@ clean$county_id <- as.integer(clean$county_id)
 clean$event <- stri_trans_totitle(as.factor(clean$event))
 
 clean$F <- as.factor(clean$F)
-clean$property_damage_cat <- as.factor(clean$property_damage_cat)
-clean$crop_damage_cat <- as.factor(clean$crop_damage_cat)
 
 clean$start_date <- as.Date(as.character(
   strptime(clean$start_date, format = "%m/%d/%Y")))
+
+# We want to include damage_category into damage counts.
+# first swap K, M, B with 1e3, 1e6 and 1e9 respectively
+
+clean$property_damage_cat[clean$property_damage_cat == ""] <- 1
+clean$property_damage_cat[clean$property_damage_cat == "K"] <- 1e3
+clean$property_damage_cat[clean$property_damage_cat == "M"] <- 1e6
+clean$property_damage_cat[clean$property_damage_cat == "B"] <- 1e9
+
+clean$crop_damage_cat[clean$crop_damage_cat == ""] <- 1
+clean$crop_damage_cat[clean$crop_damage_cat == "K"] <- 1e3
+clean$crop_damage_cat[clean$crop_damage_cat == "M"] <- 1e6
+clean$crop_damage_cat[clean$crop_damage_cat == "B"] <- 1e9
+
+# now multiply to get correct damage values
+
+clean$property_damage <- as.numeric(clean$property_damage) * as.numeric(clean$property_damage_cat)
+
+clean$crop_damage <- as.numeric(clean$crop_damage) * as.numeric(clean$crop_damage_cat)
 ```
 
 # Results
@@ -343,9 +360,17 @@ ggplot(state_harm, aes(x = values,
   
   labs(x = NULL,
        y = NULL,
-       colour = NULL) +
+       colour = NULL,
+       title = "Destructive Weather Events in the United States",
+       subtitle = "National Climatic Data Center Storm Events 1950 - 2011",
+       caption = "*Property Damages are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-5 only tornado, thunderstorm wind and hail events keyed to digital") +
   
-  guides(fill = guide_legend(title = NULL)) +
+  guides(fill = guide_legend(title = NULL)) + 
+  
+  scale_fill_discrete(labels = c("Fatalities",
+                                 "Injuries",
+                                 "Events",
+                                 "Property Damage $")) +
   
   theme(
     legend.position = "bottom",
@@ -353,10 +378,7 @@ ggplot(state_harm, aes(x = values,
                                       size = 1,
                                       linetype = "dotted")) + 
   
-  scale_x_log10(breaks = c(1e1, 1e3, 1e5),
-                labels = c("10", "1,000", "100,000")) +
-  
-  ggtitle("Destructive Weather Events in United States",
-          subtitle = "National Climatic Data Center 1950 - 2011")
+  scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6),
+                labels = c("10", "100", "1,000","10,000", "100,000", "1,000,000"))
 
 ```

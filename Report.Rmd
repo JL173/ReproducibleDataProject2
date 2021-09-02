@@ -267,17 +267,19 @@ ggplot(eco_short, aes(x = Incidents,
   
   geom_point() +
   
-  labs(x = "Damage in $",
+  labs(x = "Damage in $100,000s",
        y = NULL,
        colour = NULL) +
   
   guides(fill = guide_legend(title = NULL)) +
   
-  theme(
-    legend.position = "bottom") + 
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_line(colour = "white",
+                                      size = 1,
+                                      linetype = "dotted")) +
   
-  scale_x_log10(breaks = c(1e4, 1e5, 1e6),
-                labels = c("10,000", "100,000", "1,000,000")) +
+  scale_x_log10(breaks = c(1e5, 1e7, 1e9, 1e11),
+                labels = c("1", "100", "10,000", "1,000,000")) +
   
   ggtitle("Total Damage caused by Weather Events",
           subtitle = "United States 1950 - 2011")
@@ -292,12 +294,9 @@ ANALYSIS / SUMMARY OF VISUAL
 state_harm <- clean %>%
   group_by(state_id) %>%
   summarise(number_of_events = n(),
-            property_damage = sum(property_damage),
-            crop_damage = sum(crop_damage),
-            total_damage = sum(property_damage) + sum(crop_damage),
+            property_damage = sum(property_damage, na.rm=TRUE)/1e4,
             fatalities = sum(fatalities),
-            injuries = sum(injuries),
-            total_sum = sum(fatalities) + sum(injuries)) %>%
+            injuries = sum(injuries)) %>%
   arrange(desc(number_of_events))
 
 state_harm <- merge(state_harm, states)
@@ -312,12 +311,12 @@ state_i <- state_harm
 # rename two columns to merge on
 state_n$values <- state_n$number_of_events
 colnames(state_p)[3] <- "values"
-colnames(state_f)[6] <- "values"
-colnames(state_i)[7] <- "values"
+colnames(state_f)[4] <- "values"
+colnames(state_i)[5] <- "values"
 
 # create a label to split data on plotting
 state_n$label <- "Number of Events"
-state_p$label <- "Property Damage $"
+state_p$label <- "Damages $10,000s"
 state_f$label <- "Fatalities"
 state_i$label <- "Injuries"
 
@@ -363,14 +362,14 @@ ggplot(state_harm, aes(x = values,
        colour = NULL,
        title = "Destructive Weather Events in the United States",
        subtitle = "National Climatic Data Center Storm Events 1950 - 2011",
-       caption = "*Property Damages are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-5 only tornado, thunderstorm wind and hail events keyed to digital") +
+       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") +
   
   guides(fill = guide_legend(title = NULL)) + 
   
   scale_fill_discrete(labels = c("Fatalities",
                                  "Injuries",
                                  "Events",
-                                 "Property Damage $")) +
+                                 "Damages $10,000s")) +
   
   theme(
     legend.position = "bottom",
@@ -378,7 +377,7 @@ ggplot(state_harm, aes(x = values,
                                       size = 1,
                                       linetype = "dotted")) + 
   
-  scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6),
-                labels = c("10", "100", "1,000","10,000", "100,000", "1,000,000"))
+  scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7),
+                labels = c("10", "100", "1,000","10,000", "100,000", "1,000,000", "10,000,000"))
 
 ```

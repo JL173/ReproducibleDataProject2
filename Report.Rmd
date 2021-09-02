@@ -266,5 +266,16 @@ ANALYSIS / SUMMARY OF VISUAL
 ## State that suffers the most
 
 ```{r}
+state_harm <- clean %>%
+  group_by(state_id) %>%
+  summarise(number_of_events = n(),
+            property_damage = sum(property_damage),
+            crop_damage = sum(crop_damage),
+            total_damage = sum(property_damage) + sum(crop_damage),
+            fatalities = sum(fatalities),
+            injuries = sum(injuries),
+            total_sum = sum(fatalities) + sum(injuries)) %>%
+  arrange(desc(total_sum), desc(total_damage))
 
+state_harm <- merge(state_harm, states)
 ```

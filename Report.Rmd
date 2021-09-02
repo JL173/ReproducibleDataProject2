@@ -121,22 +121,28 @@ We will group by event and summarise the data
 
 # plot for the top 15 by total of fatalities and injuries
 ggplot(direct_harm[1:20, ]) + 
+  
   geom_point(aes(x = total_fatalities,
                  y = reorder(event, total_sum)),
-             size = 4, colour = "#B22222") +
+             size = 3, colour = "#B22222") +
+  
   geom_point(aes(x = total_injuries,
-                 y = reorder(event, total_sum),
-             size = 1, colour = "#22B2B2")) +
+                 y = reorder(event, total_sum)),
+             size = 3, colour = "#22B2B2") +
+  
   theme(
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
-    panel.grid.major.y = element_line(colour = "grey60", linetype = "dashed"),
-    legend.position = "none"
+    panel.grid.major.y = element_line(colour = "grey60", linetype = "dashed")
   ) + 
   scale_x_log10() +
+  scale_colour_manual(name = "",
+                      values = c("Fatalities" = "#B22222",
+                                 "Injuries" = "#22B2B2"))+
+  
   ggtitle("Total Fatalities and Injuries by Weather Events",
           subtitle = "United States 1950 - 2011") + 
   xlab("Sum of Incidents") +
-  ylab(NULL) + 
-  scale_fill_discrete(labels = c("Injuries", "Fatalities"))
+  ylab(NULL)
+  
 ```

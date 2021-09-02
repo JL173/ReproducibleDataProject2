@@ -155,7 +155,7 @@ head(direct_harm)
 
 From the summary above, we can see that Tornados have the most fatalities and injuries associated with them. We can also see that the most frequent event is Thunderstorm Wind (Tstm Wind). 
 
-To build a visual, we will adjust the dataframe. Trim to just the top 20 contributing events, sorted by sum of damages. Then collapse fatalities and injuries into one column but associating a label with each for ggplot to interpret.
+To build a visual, we will adjust the dataframe. Trim to just the top 20 contributing events, sorted by sum of fatalities and injuries. Then collapse fatalities and injuries into one column, but associating a label with each, for ggplot to interpret.
 
 ```{r}
 # trim a copy of dataframe to top20, select key columns
@@ -183,7 +183,7 @@ rm(direct_harm)
 
 Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.
 
-```{r fig.height=5, fig.width=7}
+```{r fig.height=6, fig.width=7}
 # plot for the top 20 by total of fatalities and injuries
 ggplot(dh_short, aes(x = Incidents,
                  y = reorder(event, total_sum),
@@ -201,7 +201,7 @@ ggplot(dh_short, aes(x = Incidents,
        colour = NULL,
        title = "Total Harm caused by Weather Events in\nThe United States",
        subtitle = "Source: National Climatic Data Center Storm Events 1950 - 2011",
-       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") 
+       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") +
   
   guides(fill = guide_legend(title = NULL)) +
   
@@ -236,7 +236,7 @@ head(economic_harm)
 
 From the summary above we can see that Flood causes the most expensive damage, over twice the next event, Hurricane/Typhoon. The event most damaging to crops is Drought. Especially noteworthy as it causes relatively low property damage. Floods are second in crop damage, but as already mentioned, deal significant property damage also.
 
-To build a visual, we will adjust the dataframe. Trim to just the top 20 contributing events, sorted by sum of damages. Then collapse fatalities and injuries into one column but associating a label with each for ggplot to interpret.
+To build a visual, we will adjust the dataframe. Trim to just the top 20 contributing events, sorted by sum of damages. Then collapse property damages and crop damages into one column, but associating a label with each, for ggplot to interpret.
 
 ```{r}
 # trim a copy of dataframe to top20, select key columns
@@ -265,11 +265,9 @@ rm(eco_short2)
 rm(economic_harm)
 ```
 
+Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.
 
-
-
-
-```{r, fig.height=5, fig.width=7}
+```{r, fig.height=6, fig.width=7}
 # plot for the top 20 by total of fatalities and injuries
 ggplot(eco_short, aes(x = Incidents,
                  y = reorder(event, total_damage),
@@ -287,7 +285,7 @@ ggplot(eco_short, aes(x = Incidents,
        colour = NULL,
        title = "Total Damage caused by Weather Events\nin the United States",
        subtitle = "Source: National Climatic Data Center Storm Events 1950 - 2011",
-       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") 
+       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") +
   
   guides(fill = guide_legend(title = NULL)) +
   

@@ -19,6 +19,7 @@ Storms and other severe weather events can cause both public health and economic
 library(tidyverse)
 library(ggplot2)
 library(ggthemes)
+library(stringi)
 ```
 
 # Loading and Processing the Raw Data
@@ -94,7 +95,9 @@ colnames(clean) <- c("state_id", "county_id", "start_date", "start_time", "event
 # cast raw into correct types and formats
 clean$state_id <- as.integer(clean$state_id)
 clean$county_id <- as.integer(clean$county_id)
-clean$event <- as.factor(clean$event)
+
+clean$event <- stri_trans_totitle(as.factor(clean$event))
+
 clean$F <- as.factor(clean$F)
 clean$property_damage_cat <- as.factor(clean$property_damage_cat)
 clean$crop_damage_cat <- as.factor(clean$crop_damage_cat)
@@ -176,7 +179,7 @@ ggplot(dh_short, aes(x = Incidents,
   scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5),
                 labels = c("10", "100", "1,000", "10,000", "100,000")) +
   
-  ggtitle("Total Fatalities and Injuries by Weather Events",
+  ggtitle("Total Harm caused by Weather Events",
           subtitle = "United States 1950 - 2011")
 ```
 

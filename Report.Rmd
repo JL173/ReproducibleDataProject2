@@ -15,10 +15,9 @@ Storms and other severe weather events can cause both public health and economic
 
 ########################### <- summary of findings here
 
-```{r}
+```{r, echo = FALSE}
 library(tidyverse)
 library(ggplot2)
-library(lubridate)
 library(ggthemes)
 ```
 
@@ -26,7 +25,7 @@ library(ggthemes)
 
 This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
 
-```{r}
+```{r, cache=TRUE}
 # Download data
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", "rawdata.csv.bz2")
 
@@ -73,30 +72,35 @@ To process the data for analysis, we will select only the variables that we have
 
 Secondly, we will create a dataframe for locations, containing both state and county ids with their respective state and county names, for reference.
 
-```{r}
+```{r, cache=TRUE}
 # collect location IDs for reference and remove duplicate rows
-locations <- select(raw, "STATE__", "STATE", "COUNTY", "COUNTYNAME") %>%
+counties <- select(raw, "STATE__", "STATE", "COUNTY", "COUNTYNAME") %>%
   distinct(.keep_all = TRUE)
 
-colnames(locations) <- c("state_id", "state_name", "county_id", "county_name")
+colnames(counties) <- c("state_id", "state_name", "county_id", "county_name")
+
+states <- select(raw, "STATE__", "STATE") %>%
+  distinct(.keep_all = TRUE)
+
+colnames(states) <- c("state_id", "state_name")
 
 
 # trim raw to chosen variables
-raw <- select(raw, c("STATE__", "COUNTY", "BGN_DATE", "BGN_TIME", "EVTYPE", "LENGTH", "WIDTH", "F", "REMARKS", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP"))
+clean <- select(raw, c("STATE__", "COUNTY", "BGN_DATE", "BGN_TIME", "EVTYPE", "LENGTH", "WIDTH", "F", "REMARKS", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP"))
 
 # rename columns
-colnames(raw) <- c("state_id", "county_id", "start_date", "start_time", "event", "length", "width", "F", "remarks", "fatalities", "injuries", "property_damage", "property_damage_cat", "crop_damage", "crop_damage_cat")
+colnames(clean) <- c("state_id", "county_id", "start_date", "start_time", "event", "length", "width", "F", "remarks", "fatalities", "injuries", "property_damage", "property_damage_cat", "crop_damage", "crop_damage_cat")
 
 # cast raw into correct types and formats
-raw$state_id <- as.integer(raw$state_id)
-raw$county_id <- as.integer(raw$county_id)
-raw$event <- as.factor(raw$event)
-raw$F <- as.factor(raw$F)
-raw$property_damage_cat <- as.factor(raw$property_damage_cat)
-raw$crop_damage_cat <- as.factor(raw$crop_damage_cat)
+clean$state_id <- as.integer(clean$state_id)
+clean$county_id <- as.integer(clean$county_id)
+clean$event <- as.factor(clean$event)
+clean$F <- as.factor(clean$F)
+clean$property_damage_cat <- as.factor(clean$property_damage_cat)
+clean$crop_damage_cat <- as.factor(clean$crop_damage_cat)
 
-raw$start_date <- as.Date(as.character(
-  strptime(raw$start_date, format = "%m/%d/%Y")))
+clean$start_date <- as.Date(as.character(
+  strptime(clean$start_date, format = "%m/%d/%Y")))
 ```
 
 # Results
@@ -112,7 +116,7 @@ There are a few ways to interpret this. Direct harm, is easily fatalities and in
 We will group by event and summarise the data
 
 ```{r}
- direct_harm <- raw %>%
+ direct_harm <- clean %>%
   group_by(event) %>%
   summarise(number_of_events = n(),
             total_fatalities = sum(fatalities),
@@ -156,7 +160,7 @@ ggplot(dh_short, aes(x = Incidents,
   
   theme_economist() + 
   
-  scale_colour_stata() +
+  scale_colour_gdocs() +
   
   geom_point() +
   
@@ -187,7 +191,7 @@ This second question we want to investigate is the following
 In this regard, we will investigate the effects of these weather events on damage to Property and damage to Crops.
 
 ```{r}
-economic_harm <- raw %>%
+economic_harm <- clean %>%
   group_by(event) %>%
   summarise(number_of_events = n(),
             property_damage = sum(property_damage),
@@ -233,7 +237,7 @@ ggplot(eco_short, aes(x = Incidents,
   
   theme_economist() + 
   
-  scale_colour_stata() +
+  scale_colour_gdocs() +
   
   geom_point() +
   

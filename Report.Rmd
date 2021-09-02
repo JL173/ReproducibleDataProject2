@@ -150,8 +150,14 @@ We will group by event and summarise the data
             total_sum = sum(fatalities) + sum(injuries)) %>%
   arrange(desc(total_sum))
 
+head(direct_harm)
+```
 
+From the summary above, we can see that Tornados have the most fatalities and injuries associated with them. We can also see that the most frequent event is Thunderstorm Wind (Tstm Wind). 
 
+To build a visual, we will adjust the dataframe. Trim to just the top 20 contributing events, sorted by sum of damages. Then collapse fatalities and injuries into one column but associating a label with each for ggplot to interpret.
+
+```{r}
 # trim a copy of dataframe to top20, select key columns
 dh_short <- direct_harm[1:20, ]
 dh_short2 <- dh_short
@@ -186,13 +192,16 @@ ggplot(dh_short, aes(x = Incidents,
   
   theme_economist() + 
   
-  scale_colour_gdocs() +
+  scale_colour_stata() +
   
   geom_point() +
   
   labs(x = "Sum of Incidents",
        y = NULL,
-       colour = NULL) +
+       colour = NULL,
+       title = "Total Harm caused by Weather Events in\nThe United States",
+       subtitle = "Source: National Climatic Data Center Storm Events 1950 - 2011",
+       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") 
   
   guides(fill = guide_legend(title = NULL)) +
   
@@ -200,13 +209,10 @@ ggplot(dh_short, aes(x = Incidents,
     legend.position = "bottom") + 
   
   scale_x_log10(breaks = c(1e1, 1e2, 1e3, 1e4, 1e5),
-                labels = c("10", "100", "1,000", "10,000", "100,000")) +
-  
-  ggtitle("Total Harm caused by Weather Events",
-          subtitle = "United States 1950 - 2011")
+                labels = c("10", "100", "1,000", "10,000", "100,000"))
 ```
 
-As you can see from the graph above, for every event, the number of injuries surpasses the number of fatalities. Which is to expected. The exception is RIP CURRENT, which understandably is very dangerous once one has been trapped. The most destructive event by far in the U.S. is TORNADO, with both regards to total fatalities and total injuries. The latter by a stunning degree. Tornadoes are highly destructive events and they frequent the country.
+As you can see from the graph above, for every event, the number of injuries surpasses the number of fatalities. Which is to expected. The exception is Rip Current, which understandably is very dangerous once one has been dragged into one. The most destructive event by far in the U.S. is Tornado, with both regards to total fatalities and total injuries. The latter by a stunning degree. Tornadoes are highly destructive events and they frequent the country.
 
 ## Most harmful events with respect to the economy
 
@@ -214,7 +220,7 @@ This second question we want to investigate is the following
 
 - Across the United States, which types of events have the greatest economic consequences?
 
-In this regard, we will investigate the effects of these weather events on damage to Property and damage to Crops.
+In this regard, we will investigate the effects of these weather events on damage to Property and damage to Crops. To do so we will group by events and take the sum of property damage and the sum of crop damage, then sort by the total of the two. 
 
 ```{r}
 economic_harm <- clean %>%
@@ -225,7 +231,14 @@ economic_harm <- clean %>%
             total_damage = sum(property_damage) + sum(crop_damage)) %>%
   arrange(desc(total_damage))
 
+head(economic_harm)
+```
 
+From the summary above we can see that Flood causes the most expensive damage, over twice the next event, Hurricane/Typhoon. The event most damaging to crops is Drought. Especially noteworthy as it causes relatively low property damage. Floods are second in crop damage, but as already mentioned, deal significant property damage also.
+
+To build a visual, we will adjust the dataframe. Trim to just the top 20 contributing events, sorted by sum of damages. Then collapse fatalities and injuries into one column but associating a label with each for ggplot to interpret.
+
+```{r}
 # trim a copy of dataframe to top20, select key columns
 eco_short <- economic_harm[1:20, ]
 eco_short2 <- eco_short
@@ -252,7 +265,9 @@ rm(eco_short2)
 rm(economic_harm)
 ```
 
-### FILL information and summary
+
+
+
 
 ```{r, fig.height=5, fig.width=7}
 # plot for the top 20 by total of fatalities and injuries
@@ -263,13 +278,16 @@ ggplot(eco_short, aes(x = Incidents,
   
   theme_economist() + 
   
-  scale_colour_gdocs() +
+  scale_colour_stata() +
   
   geom_point() +
   
   labs(x = "Damage in $100,000s",
        y = NULL,
-       colour = NULL) +
+       colour = NULL,
+       title = "Total Damage caused by Weather Events\nin the United States",
+       subtitle = "Source: National Climatic Data Center Storm Events 1950 - 2011",
+       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") 
   
   guides(fill = guide_legend(title = NULL)) +
   
@@ -279,10 +297,7 @@ ggplot(eco_short, aes(x = Incidents,
                                       linetype = "dotted")) +
   
   scale_x_log10(breaks = c(1e5, 1e7, 1e9, 1e11),
-                labels = c("1", "100", "10,000", "1,000,000")) +
-  
-  ggtitle("Total Damage caused by Weather Events",
-          subtitle = "United States 1950 - 2011")
+                labels = c("1", "100", "10,000", "1,000,000"))
 
 ```
 
@@ -294,7 +309,7 @@ ANALYSIS / SUMMARY OF VISUAL
 state_harm <- clean %>%
   group_by(state_id) %>%
   summarise(number_of_events = n(),
-            property_damage = sum(property_damage, na.rm=TRUE)/1e4,
+            damage = (sum(property_damage, na.rm=TRUE) + sum(crop_damage, na.rm=TRUE))/1e4,
             fatalities = sum(fatalities),
             injuries = sum(injuries)) %>%
   arrange(desc(number_of_events))
@@ -334,14 +349,11 @@ state_n <- rbind(state_n, state_i)
 
 state_harm <- state_n
 
-# remove temporary dataframes
-rm(state_n, state_p, state_f, state_i)
-```
-
-```{r}
 # sorting
 arrange(state_harm, desc(number_of_events))
 
+# remove temporary dataframes
+rm(state_n, state_p, state_f, state_i)
 ```
 
 ```{r, fig.height=14, fig.width=7}
@@ -353,7 +365,7 @@ ggplot(state_harm, aes(x = values,
   
   theme_economist() + 
   
-  scale_colour_gdocs() +
+  scale_colour_stata() +
   
   geom_point() +
   
@@ -361,8 +373,8 @@ ggplot(state_harm, aes(x = values,
        y = NULL,
        colour = NULL,
        title = "Destructive Weather Events in the United States",
-       subtitle = "National Climatic Data Center Storm Events 1950 - 2011",
-       caption = "*Damages to Property are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") +
+       subtitle = "Source: National Climatic Data Center Storm Events 1950 - 2011",
+       caption = "*Damages are estimates\n1950-54 only tornado events recorded\n 1955-92 only tornado, thunderstorm wind and hail events keyed to digital\n1993-95 only tornado, thunderstorm wind and hail events keyed to digital") +
   
   guides(fill = guide_legend(title = NULL)) + 
   

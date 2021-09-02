@@ -18,6 +18,7 @@ Storms and other severe weather events can cause both public health and economic
 ```{r}
 library(tidyverse)
 library(ggplot2)
+library(lubridate)
 ```
 
 # Loading and Processing the Raw Data
@@ -46,8 +47,8 @@ str(raw)
 
 Information that we will explore are
 
-- Location: COUNTY, COUNTYNAME, STATE
-- Time: BGN_DATE, BGN_TIME, END_DATE, END_TIME
+- Location: STATE_, COUNTY, COUNTYNAME, STATE
+- Time: BGN_DATE, BGN_TIME
 - Event Information: EVTYPE, LENGTH, WIDTH, F, REMARKS
 - Damage: FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
 
@@ -61,4 +62,28 @@ For F, The "Saffir-Simpson Hurricane and Tropical Cyclone Scale" is used
 4. Windspeed 114-135 kts (131-155 mph), storm tide: 13-18 FT, Damage: Severe  
 5. Windspeed >135 kts (>155 mph), storm tide: >18 FT, Damage: Catastrophic
 
+For REMARKS, this is a description of the event.
+
 For PROPDMGEXP and CROPDMGEXP, characters are used to signify cost of damage and include “K” for thousands, “M” for millions, and “B” for billions.
+
+```{r}
+# collect location IDs for reference
+locations <- select(raw, "STATE__", "STATE", "COUNTY", "COUNTYNAME")
+
+# trim rawdata to chosen variables
+raw <- select(raw, c("STATE__", "COUNTY", "BGN_DATE", "BGN_TIME", "EVTYPE", "LENGTH", "WIDTH", "F", "REMARKS", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP"))
+
+# rename columns
+colnames(raw) <- c("state_id", "county_id", "start_date", "start_time", "event", "length", "width", "F", "remarks", "fatalities", "injuries", "property_damage", "property_damage_cat", "crop_damage", "crop_damage_cat")
+
+# cast raw into correct types and formats
+raw$state_id <- as.integer(raw$state_id)
+raw$county_id <- as.integer(raw$county_id)
+raw$F <- as.factor(raw$F)
+raw$property_damage_cat <- as.factor(raw$property_damage_cat)
+raw$crop_damage_cat <- as.factor(raw$crop_damage_cat)
+
+raw$start_date <- as.Date(as.character(
+  strptime(raw$start_date, format = "%m/%d/%Y")))
+
+```

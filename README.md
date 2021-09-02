@@ -86,4 +86,4 @@ Submitting Your Assignment
 
 In order to submit this assignment, you must copy the RPubs URL for your completed data analysis document in to the peer assessment question.
 
-If you choose to submit as a PDF, please insert an obvious placeholder URL (e.g. [https://google.com](https://google.com)/)) in order to allow submission.
+If you choose to submit as a PDF, please insert an obvious placeholder URL (e.g. [https://google.com](https://google.com)) in order to allow submission.

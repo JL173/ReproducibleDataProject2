@@ -100,6 +100,8 @@ raw$start_date <- as.Date(as.character(
 
 # Analysis
 
+## Most harmful events to people's health
+
 This first question we want ot investigate is the following
 
 - Across the United States, which types of events are most harmful with respect to population health?
@@ -124,8 +126,7 @@ Now we have the summarised data.
 
 ```{r}
 # trim a copy of dataframe to top20, select key columns
-dh_short <- direct_harm[1:20, ] %>%
-  select(-c("mean_fatalities","mean_injuries"))
+dh_short <- direct_harm[1:20, ]
 dh_short2 <- dh_short
 
 # rename two columns to merge on
@@ -137,37 +138,36 @@ dh_short <- select(dh_short, c("event", "total_sum", "Incidents"))
 dh_short2 <- select(dh_short2, c("event", "total_sum", "Incidents"))
 
 # create a label to split data on plotting
-dh_short$label <- "total_fatalities"
-dh_short2$label <- "total_injuries"
+dh_short$label <- "Fatalities"
+dh_short2$label <- "Injuries"
 
 # merge dataframes, remove the temprorary second
 dh_short <- rbind(dh_short, dh_short2)
+
 rm(dh_short2)
+rm(direct_harm)
 ```
 
 Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.
+
 ```{r}
 
 # plot for the top 20 by total of fatalities and injuries
-ggplot(direct_harm[1:20, ]) + 
+ggplot(dh_short, aes(x = Incidents,
+                 y = reorder(event, total_sum),
+                 colour = label),
+                 size = 3) + 
   
-  geom_point(aes(x = total_fatalities,
-                 y = reorder(event, total_sum)),
-             size = 3, color = "#de425b", fill = "#de425b") +
- 
-   
-  geom_point(aes(x = total_injuries,
-                 y = reorder(event, total_sum)),
-             size = 3, color = "#488f31", fill = "488f31") +
+  geom_point() +
   
   labs(x = "Sum of Incidents",
        y = NULL,
-       color = "Legend") +
+       colour = NULL) +
   
-  scale_color_manual(values = c("Fatalities" = "#de425b",
-                                 "Injuries" = "#488f31")) +
+  guides(fill = guide_legend(title = NULL)) +
   
   theme(
+    legend.position = "bottom",
     plot.title = element_text(size = rel(1.2), lineheight = 0.9,
                                face = "bold", color = "brown"),
     panel.grid.major.x = element_blank(),
@@ -180,10 +180,8 @@ ggplot(direct_harm[1:20, ]) +
   
   ggtitle("Total Fatalities and Injuries by Weather Events",
           subtitle = "United States 1950 - 2011")
-
 ```
-```{r}
-# another attempt at plotting to get a legend
 
+As you can see from the graph above, for every event, the number of injuries surpasses the number of fatalities. Which is to expected. The exception is RIP CURRENT, which understandably is very dangerous once one has been trapped. The most destructive event by far in the U.S. is TORNADO, with both regards to total fatalities and total injuries. The latter by a stunning degree. Tornadoes are highly destructive events and they frequent the country.
 
-```
+## Most harmful events with respect to the economy

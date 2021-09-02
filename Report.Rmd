@@ -80,7 +80,7 @@ locations <- select(raw, "STATE__", "STATE", "COUNTY", "COUNTYNAME") %>%
 colnames(locations) <- c("state_id", "state_name", "county_id", "county_name")
 
 
-# trim rawdata to chosen variables
+# trim raw to chosen variables
 raw <- select(raw, c("STATE__", "COUNTY", "BGN_DATE", "BGN_TIME", "EVTYPE", "LENGTH", "WIDTH", "F", "REMARKS", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP"))
 
 # rename columns
@@ -89,6 +89,7 @@ colnames(raw) <- c("state_id", "county_id", "start_date", "start_time", "event",
 # cast raw into correct types and formats
 raw$state_id <- as.integer(raw$state_id)
 raw$county_id <- as.integer(raw$county_id)
+raw$event <- as.factor(raw$event)
 raw$F <- as.factor(raw$F)
 raw$property_damage_cat <- as.factor(raw$property_damage_cat)
 raw$crop_damage_cat <- as.factor(raw$crop_damage_cat)
@@ -97,3 +98,45 @@ raw$start_date <- as.Date(as.character(
   strptime(raw$start_date, format = "%m/%d/%Y")))
 ```
 
+# Analysis
+
+This first question we want ot investigate is the following
+
+- Across the United States, which types of events are most harmful with respect to population health?
+
+There are a few ways to interpret this. Direct harm, is easily fatalities and injuries, however indirectly we could have the economic impact such as property damage, or crop damage. So we will limit this to the direct harm.
+
+We will group by event and summarise the data
+
+```{r}
+ direct_harm <- raw %>%
+  group_by(event) %>%
+  summarise(number_of_events = n(),
+            total_fatalities = sum(fatalities),
+            total_injuries = sum(injuries),
+            total_sum = sum(fatalities) + sum(injuries),
+            mean_fatalities = mean(fatalities),
+            mean_injuries = mean(injuries)) %>%
+  arrange(desc(total_sum))
+
+# plot for the top 15 by total of fatalities and injuries
+ggplot(direct_harm[1:20, ]) + 
+  geom_point(aes(x = total_fatalities,
+                 y = reorder(event, total_sum)),
+             size = 4, colour = "#B22222") +
+  geom_point(aes(x = total_injuries,
+                 y = reorder(event, total_sum),
+             size = 1, colour = "#22B2B2")) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(colour = "grey60", linetype = "dashed"),
+    legend.position = "none"
+  ) + 
+  scale_x_log10() +
+  ggtitle("Total Fatalities and Injuries by Weather Events",
+          subtitle = "United States 1950 - 2011") + 
+  xlab("Sum of Incidents") +
+  ylab(NULL) + 
+  scale_fill_discrete(labels = c("Injuries", "Fatalities"))
+```

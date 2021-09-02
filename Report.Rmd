@@ -1,5 +1,5 @@
 ---
-title: 'Project 2'
+title: 'Exploration of National Climatic Data Center Storm Events Data'
 author: "JL"
 date: "02/09/2021"
 output: html_document
@@ -13,9 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
 
-########################### <- summary of findings here
+Here we take the combined data from 1950 through to November 2011 and explore the most destructive weather events in terms of both public harm and economic harm. Also, we explore the same considerations on a State-by-state basis. Three visuals are produced to convey these findings. The data and code to produce the same visuals and conclusions is included in this report.
 
-```{r, echo = FALSE}
+```{r}
 library(tidyverse)
 library(ggplot2)
 library(ggthemes)
@@ -356,10 +356,12 @@ state_n <- rbind(state_n, state_i)
 state_harm <- state_n
 
 # sorting
-arrange(state_harm, desc(number_of_events))
+arrange(state_harm, desc(number_of_events));
 
 # remove temporary dataframes
 rm(state_n, state_p, state_f, state_i)
+
+head(state_harm)
 ```
 
 Now we have the data we need for plotting an informational visual in a way that allows us to create it easily.

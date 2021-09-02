@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
 
-## Summary of Findings
+########################### <- summary of findings here
 
 ```{r}
 library(tidyverse)
@@ -35,3 +35,30 @@ download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd010
 raw <- read.csv("rawdata.csv.bz2")
 ```
 
+The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to a lack of good records. More recent years should be considered more complete.
+
+## The Data
+
+The dataframe `raw` has 37 columns and 900,000+ observations across the united states. Here is a brief overview.
+```{r}
+str(raw)
+```
+
+Information that we will explore are
+
+- Location: COUNTY, COUNTYNAME, STATE
+- Time: BGN_DATE, BGN_TIME, END_DATE, END_TIME
+- Event Information: EVTYPE, LENGTH, WIDTH, F, REMARKS
+- Damage: FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
+
+For LENGTH and WIDTH, this is the path length (in miles and tenths of miles) and maximum path width (in yards) for all tornadoes.
+
+For F, The "Saffir-Simpson Hurricane and Tropical Cyclone Scale" is used
+
+1. Windspeed 64-82 kts (74-95 mph), storm tide: 4-5 FT, Damage: Minor  
+2. Windspeed 83-95 kts (96-110 mph), storm tide: 6-8 FT, Damage: Moderate  
+3. Windspeed 96-113 kts (111-130 mph), storm tide: 9-12 FT, Damage: Major  
+4. Windspeed 114-135 kts (131-155 mph), storm tide: 13-18 FT, Damage: Severe  
+5. Windspeed >135 kts (>155 mph), storm tide: >18 FT, Damage: Catastrophic
+
+For PROPDMGEXP and CROPDMGEXP, characters are used to signify cost of damage and include “K” for thousands, “M” for millions, and “B” for billions.

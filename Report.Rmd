@@ -66,9 +66,19 @@ For REMARKS, this is a description of the event.
 
 For PROPDMGEXP and CROPDMGEXP, characters are used to signify cost of damage and include “K” for thousands, “M” for millions, and “B” for billions.
 
+## Processing
+
+To process the data for analysis, we will select only the variables that we have outlined above. Further, we will rename these variables to more accessible versions and ensure they are cast into the correct type for calculations. 
+
+Secondly, we will create a dataframe for locations, containing both state and county ids with their respective state and county names, for reference.
+
 ```{r}
-# collect location IDs for reference
-locations <- select(raw, "STATE__", "STATE", "COUNTY", "COUNTYNAME")
+# collect location IDs for reference and remove duplicate rows
+locations <- select(raw, "STATE__", "STATE", "COUNTY", "COUNTYNAME") %>%
+  distinct(.keep_all = TRUE)
+
+colnames(locations) <- c("state_id", "state_name", "county_id", "county_name")
+
 
 # trim rawdata to chosen variables
 raw <- select(raw, c("STATE__", "COUNTY", "BGN_DATE", "BGN_TIME", "EVTYPE", "LENGTH", "WIDTH", "F", "REMARKS", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP"))
@@ -85,5 +95,5 @@ raw$crop_damage_cat <- as.factor(raw$crop_damage_cat)
 
 raw$start_date <- as.Date(as.character(
   strptime(raw$start_date, format = "%m/%d/%Y")))
-
 ```
+
